@@ -1,0 +1,46 @@
+# Deux services : la base PostgreSQL et l'application.
+#
+# Démarrage rapide (tout en Docker) :
+#   docker compose up --build
+#   → application sur http://localhost:3000
+#
+# Workflow de développement recommandé (base en Docker, app en local) :
+#   docker compose up -d db
+#   npm install && npm run db:push && npm run db:seed && npm run dev
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: agrownuts
+      POSTGRES_PASSWORD: agrownuts
+      POSTGRES_DB: agrownuts
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agrownuts"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "postgresql://agrownuts:agrownuts@db:5432/agrownuts?schema=public"
+      AUTH_SECRET: "${AUTH_SECRET:-dev-secret-a-changer-en-production}"
+      AUTH_URL: "${AUTH_URL:-http://localhost:3000}"
+      SEED_ADMIN_EMAIL: "${SEED_ADMIN_EMAIL:-admin@agrownuts.fr}"
+      SEED_ADMIN_PASSWORD: "${SEED_ADMIN_PASSWORD:-AgroNuts2026!}"
+      SEED_ADMIN_NAME: "${SEED_ADMIN_NAME:-Hugo}"
+    ports:
+      - "3000:3000"
+
+volumes:
+  db_data:

@@ -1,0 +1,10 @@
+{
+  "name": "AgroNuts — Plateforme de gestion",
+  "short_name": "AgroNuts",
+  "description": "Gestion du stock, du séchage, de la production et de l'administratif.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#211d18",
+  "theme_color": "#211d18",
+  "lang": "fr"
+}

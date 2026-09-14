@@ -1,0 +1,227 @@
+// Schéma de données AgroNuts
+// ---------------------------------------------------------------------------
+// Étape 0 (socle) : utilisateurs + rôles, journal de connexions, journal d'audit,
+// et les fondations du module Stock (Parcelle, Lot) pour préparer l'Étape 1.
+// Chaque module ajoutera ses propres modèles ici sans casser l'existant.
+
+generator client {
+  provider      = "prisma-client-js"
+  // "native" pour le dev local, la cible musl pour l'image Docker Alpine.
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Rôles d'accès. Le rôle décide de ce que chaque personne voit et peut modifier.
+enum Role {
+  ADMIN // accès complet, gestion des comptes et de l'administratif
+  OPERATEUR // saisie quotidienne (lots, relevés de séchage, production)
+  LECTURE // consultation seule
+}
+
+/// Statut d'un lot dans son cycle de vie (fil conducteur de toute la traçabilité).
+enum LotStatut {
+  DECLARE // déclaré par un chauffeur (QR), en attente de validation admin
+  SECHOIR // au séchoir
+  BRUT_CHAMBRE_FROIDE // séché, brut, en chambre froide
+  TRANSFORME_CHAMBRE_FROIDE // transformé, en chambre froide
+  PRODUIT_FINI // conditionné / prêt à la vente
+}
+
+model User {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  name         String
+  passwordHash String
+  role         Role       @default(OPERATEUR)
+  actif        Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  loginLogs    LoginLog[]
+  auditLogs    AuditLog[]
+  lotsCrees    Lot[]      @relation("LotCreePar")
+  transformations Transformation[] @relation("TransformationCreePar")
+
+  @@map("users")
+}
+
+/// Journal des connexions (exigence sécurité).
+model LoginLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("login_logs")
+}
+
+/// Journal d'audit : chaque modification conserve qui, quand, ancienne/nouvelle valeur.
+model AuditLog {
+  id             String   @id @default(cuid())
+  entite         String // ex: "Lot", "User"
+  entiteId       String
+  champ          String? // champ modifié (null pour create/delete)
+  action         String // CREATE | UPDATE | DELETE
+  ancienneValeur String?
+  nouvelleValeur String?
+  userId         String?
+  user           User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt      DateTime @default(now())
+
+  @@index([entite, entiteId])
+  @@map("audit_logs")
+}
+
+/// Produit transformé (catégorie de sortie : graines entières, demi-graines, coques, miettes…).
+/// Stock géré en kg, avec équivalences en palox et en big bag pour le décompte.
+model Produit {
+  id         String   @id @default(cuid())
+  code       String   @unique
+  label      String
+  couleur    String   @default("#8FA678")
+  quantiteKg Decimal  @default(0) @db.Decimal(10, 2)
+  capaciteKg Decimal  @default(3000) @db.Decimal(10, 2)
+  paloxKg    Int? // poids d'un palox de ce produit (kg)
+  bigBagKg   Int? // poids d'un big bag de ce produit (kg)
+  note       String?
+  ordre      Int      @default(0)
+  createdAt  DateTime @default(now())
+  lignes     TransformationLigne[]
+
+  @@map("produits")
+}
+
+/// Remorque physique (liste déroulante gérée par l'utilisateur).
+/// Le code (ex. "B2") est repris dans la référence du lot.
+model Remorque {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  nom       String?
+  actif     Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@map("remorques")
+}
+
+/// Chauffeur (liste déroulante pour la déclaration de caisse au champ).
+model Chauffeur {
+  id        String   @id @default(cuid())
+  nom       String   @unique
+  actif     Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@map("chauffeurs")
+}
+
+/// Configuration applicative (ligne unique) : jeton du formulaire public.
+model AppConfig {
+  id               String   @id @default(cuid())
+  declarationToken String
+  updatedAt        DateTime @updatedAt
+
+  @@map("app_config")
+}
+
+/// Parcelle agricole (liste déroulante gérée par l'utilisateur).
+model Parcelle {
+  id        String   @id @default(cuid())
+  code      String   @unique // ex: "DEF" — utilisé dans le numéro de lot
+  nom       String?
+  surfaceHa Decimal? @db.Decimal(8, 2)
+  actif     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  lots      Lot[]
+
+  @@map("parcelles")
+}
+
+/// Lot = un chargement de remorque (fondation, complétée à l'Étape 1).
+/// Référence : LOT-{Parcelle}-{MM/AAAA}-{Remorque}-{Numéro}
+model Lot {
+  id               String    @id @default(cuid())
+  reference        String    @unique
+  parcelleId       String
+  parcelle         Parcelle  @relation(fields: [parcelleId], references: [id])
+  dateRecolte      DateTime
+  remorque         String // identifiant de la remorque physique (ex: "B2")
+  numeroChargement Int // numéro de chargement dans la récolte de la parcelle
+  poidsKg          Decimal   @db.Decimal(10, 2)
+  humiditeAvant    Decimal   @db.Decimal(5, 2) // % d'humidité avant séchage
+  statut           LotStatut @default(SECHOIR)
+  nbBigBag         Int? // nombre de big bags (renseigné au conditionnement)
+  localisation     String? // emplacement en chambre froide
+  sechoirPlace     Int? // emplacement dans le séchoir (1..capacité), null si hors séchoir
+  chauffeur        String? // nom du chauffeur (déclaration QR)
+  commentaire      String? // commentaire libre (déclaration QR)
+  createdById      String?
+  createdBy        User?     @relation("LotCreePar", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  transformations  Transformation[]
+  releves          ReleveSechage[]
+
+  @@index([parcelleId])
+  @@index([statut])
+  @@map("lots")
+}
+
+/// Configuration et état courant du séchoir (une seule ligne).
+model Sechoir {
+  id               String   @id @default(cuid())
+  nom              String   @default("Séchoir principal")
+  capacite         Int      @default(8)
+  temperatureC     Decimal? @db.Decimal(5, 1) // température de séchage (°C)
+  soufflerie       Int? // force de soufflerie (%)
+  humiditeCible    Decimal  @default(8) @db.Decimal(5, 2) // % visé
+  vitesseTheorique Decimal  @default(2) @db.Decimal(5, 2) // %/jour au départ
+  updatedAt        DateTime @updatedAt
+
+  @@map("sechoirs")
+}
+
+/// Relevé d'humidité d'une caisse (lot) pendant le séchage.
+model ReleveSechage {
+  id          String   @id @default(cuid())
+  lotId       String
+  lot         Lot      @relation(fields: [lotId], references: [id], onDelete: Cascade)
+  humidite    Decimal  @db.Decimal(5, 2)
+  date        DateTime @default(now())
+  createdById String?
+
+  @@index([lotId])
+  @@map("releves_sechage")
+}
+
+/// Transformation d'un lot brut en produits (traçabilité brut → produits).
+model Transformation {
+  id          String                @id @default(cuid())
+  lotId       String
+  lot         Lot                   @relation(fields: [lotId], references: [id], onDelete: Restrict)
+  date        DateTime              @default(now())
+  createdById String?
+  createdBy   User?                 @relation("TransformationCreePar", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt   DateTime              @default(now())
+  lignes      TransformationLigne[]
+
+  @@index([lotId])
+  @@map("transformations")
+}
+
+/// Une ligne = une quantité d'un produit issue d'une transformation.
+model TransformationLigne {
+  id               String         @id @default(cuid())
+  transformationId String
+  transformation   Transformation @relation(fields: [transformationId], references: [id], onDelete: Cascade)
+  produitId        String
+  produit          Produit        @relation(fields: [produitId], references: [id], onDelete: Restrict)
+  quantiteKg       Decimal        @db.Decimal(10, 2)
+
+  @@index([transformationId])
+  @@map("transformation_lignes")
+}
