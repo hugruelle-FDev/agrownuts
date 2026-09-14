@@ -7,6 +7,8 @@ import type { Role } from "@prisma/client";
  * (vérification du mot de passe) vit dans auth.ts.
  */
 export const authConfig = {
+  // Nécessaire derrière un hébergeur comme Vercel (sinon erreur UntrustedHost).
+  trustHost: true,
   pages: {
     signIn: "/login",
   },
