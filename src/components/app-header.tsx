@@ -5,6 +5,7 @@ import type { Role } from "@prisma/client";
 import { Bell, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Logo } from "@/components/logo";
 import { doSignOut } from "@/app/(app)/actions";
 
 const ROLE_LABEL: Record<Role, string> = {
@@ -25,9 +26,7 @@ export function AppHeader({
 }) {
   return (
     <header className="flex h-16 shrink-0 items-center gap-3 border-b border-border bg-card px-4 md:px-6">
-      <div className="font-display text-lg font-extrabold tracking-tight md:hidden">
-        AGRO<span className="text-accent">NUTS</span>
-      </div>
+      <Logo className="md:hidden" markClassName="h-6 w-6" textClassName="text-lg" />
       <div className="flex-1" />
       {nbAValider > 0 && (
         <Link

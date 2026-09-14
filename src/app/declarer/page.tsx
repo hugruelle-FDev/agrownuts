@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Logo } from "@/components/logo";
 import { DeclarerForm } from "./declarer-form";
 
 export const dynamic = "force-dynamic";
@@ -13,10 +14,11 @@ export default async function DeclarerPage({ searchParams }: { searchParams: { t
     <main className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md bg-card-elevated">
         <CardHeader className="items-center text-center">
-          <div className="mb-1 font-display text-2xl font-extrabold tracking-tight">
-            AGRO<span className="text-accent">NUTS</span>
-          </div>
-          <CardTitle>Déclarer une caisse</CardTitle>
+          <Logo markClassName="h-9 w-9" textClassName="text-2xl" />
+          <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
+            Authenticité · Qualité · Landais
+          </p>
+          <CardTitle className="mt-2">Déclarer une caisse</CardTitle>
           <CardDescription>Au chargement, avant dépôt au séchoir.</CardDescription>
         </CardHeader>
         <CardContent>

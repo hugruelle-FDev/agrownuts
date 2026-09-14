@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { Role } from "@prisma/client";
 import { modulesPourRole } from "@/lib/modules";
+import { Logo } from "@/components/logo";
 import { cn } from "@/lib/utils";
 
 /** Barre latérale de navigation, alimentée par le registre de modules. */
@@ -13,8 +14,8 @@ export function AppSidebar({ userRole }: { userRole: Role }) {
 
   return (
     <aside className="hidden w-64 shrink-0 flex-col border-r border-border bg-card md:flex">
-      <div className="flex h-16 items-center gap-2 border-b border-border px-5 font-display text-xl font-extrabold tracking-tight">
-        AGRO<span className="text-accent">NUTS</span>
+      <div className="flex h-16 items-center border-b border-border px-5">
+        <Logo />
       </div>
       <nav className="flex flex-1 flex-col gap-1 p-3">
         {modules.map((m) => {

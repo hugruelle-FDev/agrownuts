@@ -3,9 +3,9 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata: Metadata = {
-  title: "AgroNuts — Plateforme de gestion",
+  title: "AGROWNUTS — Plateforme de gestion",
   description:
-    "Gestion du stock, du séchage, de la production et de l'administratif pour AgroNuts.",
+    "Gestion du stock, du séchage, de la production et de l'administratif pour AGROWNUTS.",
   manifest: "/manifest.webmanifest",
 };
 

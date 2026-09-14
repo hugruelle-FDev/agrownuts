@@ -1,6 +1,6 @@
 {
-  "name": "AgroNuts — Plateforme de gestion",
-  "short_name": "AgroNuts",
+  "name": "AGROWNUTS — Plateforme de gestion",
+  "short_name": "AGROWNUTS",
   "description": "Gestion du stock, du séchage, de la production et de l'administratif.",
   "start_url": "/",
   "display": "standalone",
