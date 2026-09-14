@@ -10,50 +10,50 @@
     --font-sans: 'Public Sans';
     --font-mono: 'IBM Plex Mono';
 
-    /* ---- Thème clair (crème chaleureux) ---- */
-    --background: #f7f3ec;
-    --foreground: #241f19;
-    --card: #ffffff;
+    /* ---- Thème clair : crème & vert forêt (palette du logo) ---- */
+    --background: #f2ece0;
+    --foreground: #1e3a2c;
+    --card: #fbf7ef;
     --card-elevated: #ffffff;
-    --primary: #b5633a; /* terracotta */
-    --primary-foreground: #fff7ee;
-    --accent: #c98a1e; /* doré lisible sur clair */
-    --accent-foreground: #241f19;
-    --muted: #efe8db;
-    --muted-foreground: #6f6454;
-    --border: #e3d9c8;
-    --input: #e3d9c8;
-    --ring: #b5633a;
+    --primary: #1f3d2f; /* vert forêt */
+    --primary-foreground: #f4efe4;
+    --accent: #c0663a; /* terracotta */
+    --accent-foreground: #fff7ee;
+    --muted: #e8e0d0;
+    --muted-foreground: #5f6d60;
+    --border: #ddd3c0;
+    --input: #ddd3c0;
+    --ring: #1f3d2f;
     --success: #3e7c54;
-    --warning: #c98a1e;
+    --warning: #d98b5f; /* terracotta clair */
     --danger: #b23a2e;
 
-    /* Couleurs de marque (concept vert forêt & terracotta) */
+    /* Couleurs de marque */
     --brand-green: #1f3d2f;
     --brand-terracotta: #c0663a;
     --logo-stroke: #1f3d2f;
   }
 
   .dark {
-    /* ---- Thème sombre (repris du dashboard existant) ---- */
-    --background: #211d18;
-    --foreground: #f2ece1;
-    --card: #2a251e;
-    --card-elevated: #322c24;
-    --primary: #e8b04b; /* doré sur sombre */
-    --primary-foreground: #211d18;
-    --accent: #e8b04b;
-    --accent-foreground: #211d18;
-    --muted: #3a332a;
-    --muted-foreground: #b8ae9e;
-    --border: #4a4238;
-    --input: #4a4238;
-    --ring: #e8b04b;
+    /* ---- Thème sombre : vert forêt profond & terracotta ---- */
+    --background: #14241b;
+    --foreground: #f2ece0;
+    --card: #1f3d2f;
+    --card-elevated: #274a38;
+    --primary: #c0663a; /* terracotta */
+    --primary-foreground: #f4efe4;
+    --accent: #d4874e; /* terracotta clair */
+    --accent-foreground: #14241b;
+    --muted: #274a38;
+    --muted-foreground: #a9bca6;
+    --border: #2f4c3b;
+    --input: #2f4c3b;
+    --ring: #d4874e;
     --success: #8fa678;
-    --warning: #e8b04b;
-    --danger: #d4874e;
+    --warning: #d98b5f;
+    --danger: #e08a6a;
 
-    /* Couleurs de marque (concept vert forêt & terracotta) — variantes claires sur fond sombre */
+    /* Couleurs de marque (variantes claires sur fond vert) */
     --brand-green: #7fa06a;
     --brand-terracotta: #d4874e;
     --logo-stroke: #d4874e;
