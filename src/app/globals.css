@@ -29,8 +29,9 @@
     --danger: #b23a2e;
 
     /* Couleurs de marque (concept vert forêt & terracotta) */
-    --brand-green: #2f4a3c;
-    --brand-terracotta: #b5633a;
+    --brand-green: #1f3d2f;
+    --brand-terracotta: #c0663a;
+    --logo-stroke: #1f3d2f;
   }
 
   .dark {
@@ -55,6 +56,7 @@
     /* Couleurs de marque (concept vert forêt & terracotta) — variantes claires sur fond sombre */
     --brand-green: #7fa06a;
     --brand-terracotta: #d4874e;
+    --logo-stroke: #d4874e;
   }
 
   * {

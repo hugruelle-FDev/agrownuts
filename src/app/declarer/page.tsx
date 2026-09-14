@@ -14,9 +14,9 @@ export default async function DeclarerPage({ searchParams }: { searchParams: { t
     <main className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md bg-card-elevated">
         <CardHeader className="items-center text-center">
-          <Logo markClassName="h-9 w-9" textClassName="text-2xl" />
+          <Logo markClassName="h-10" textClassName="text-2xl" />
           <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
-            Authenticité · Qualité · Landais
+            Triage · Décorticage · Calibrage
           </p>
           <CardTitle className="mt-2">Déclarer une caisse</CardTitle>
           <CardDescription>Au chargement, avant dépôt au séchoir.</CardDescription>

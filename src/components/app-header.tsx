@@ -26,7 +26,7 @@ export function AppHeader({
 }) {
   return (
     <header className="flex h-16 shrink-0 items-center gap-3 border-b border-border bg-card px-4 md:px-6">
-      <Logo className="md:hidden" markClassName="h-6 w-6" textClassName="text-lg" />
+      <Logo className="md:hidden" markClassName="h-6" textClassName="text-lg" />
       <div className="flex-1" />
       {nbAValider > 0 && (
         <Link
