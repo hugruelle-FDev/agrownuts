@@ -2,6 +2,7 @@ import QRCode from "qrcode";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { buttonVariants } from "@/components/ui/button";
 import { RefForm } from "./ref-form";
 import { ChauffeurForm } from "./chauffeur-form";
 import { DeleteButton } from "./delete-button";
@@ -40,6 +41,22 @@ export default async function ParametresPage() {
           Les listes utilisées dans le formulaire de lot : parcelles et remorques.
         </p>
       </div>
+
+      {/* ----------------------------- Export Excel ----------------------------- */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Sauvegarde du stock (Excel)</CardTitle>
+          <CardDescription>
+            Télécharge un fichier Excel : tous les lots avec leur statut, la matière première, et les
+            produits avec les indicateurs.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <a href="/api/export" className={buttonVariants()}>
+            Télécharger l&apos;export Excel
+          </a>
+        </CardContent>
+      </Card>
 
       {/* ----------------------------- Parcelles ----------------------------- */}
       <Card>
