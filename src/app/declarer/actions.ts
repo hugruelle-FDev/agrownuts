@@ -13,6 +13,7 @@ const schema = z.object({
   poidsKg: z.coerce.number().positive("Le poids doit être positif"),
   humiditeAvant: z.coerce.number().min(0, "Humidité invalide").max(100, "Humidité invalide"),
   commentaire: z.string().trim().max(500).optional(),
+  heureSaisie: z.string().trim().max(5).optional(),
 });
 
 export type DeclarationState = { error?: string; reference?: string };
@@ -34,7 +35,7 @@ export async function declarerLot(
 
   const parsed = schema.safeParse(raw);
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Formulaire invalide." };
-  const { token, parcelleId, dateRecolte, remorque, chauffeur, poidsKg, humiditeAvant, commentaire } = parsed.data;
+  const { token, parcelleId, dateRecolte, remorque, chauffeur, poidsKg, humiditeAvant, commentaire, heureSaisie } = parsed.data;
 
   // Vérification du jeton (sécurise le formulaire public).
   const config = await prisma.appConfig.findFirst();
@@ -70,6 +71,7 @@ export async function declarerLot(
           statut: "DECLARE" as LotStatut,
           chauffeur,
           commentaire: commentaire ?? null,
+          heureSaisie: heureSaisie && heureSaisie.length > 0 ? heureSaisie : null,
         },
       });
       await prisma.auditLog

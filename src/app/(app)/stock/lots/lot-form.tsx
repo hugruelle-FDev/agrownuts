@@ -31,6 +31,7 @@ export function LotForm({
   const formRef = useRef<HTMLFormElement>(null);
 
   const aujourdhui = new Date().toISOString().slice(0, 10);
+  const maintenant = new Date().toTimeString().slice(0, 5);
   const [parcelleId, setParcelleId] = useState("");
   const [dateRecolte, setDateRecolte] = useState(aujourdhui);
   const [numero, setNumero] = useState("");
@@ -94,6 +95,11 @@ export function LotForm({
             onChange={(e) => setDateRecolte(e.target.value)}
             required
           />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="heureSaisie">Heure de mise au séchoir</Label>
+          <Input id="heureSaisie" name="heureSaisie" type="time" defaultValue={maintenant} />
         </div>
 
         <div className="flex flex-col gap-2">

@@ -24,6 +24,7 @@ const lotSchema = z.object({
     .number()
     .min(0, "Humidité invalide")
     .max(100, "L'humidité ne peut dépasser 100 %"),
+  heureSaisie: z.string().trim().max(5).optional(),
 });
 
 export type LotFormState = { error?: string; success?: string };
@@ -80,7 +81,7 @@ export async function createLot(
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Formulaire invalide." };
   }
-  const { parcelleId, dateRecolte, remorque, poidsKg, humiditeAvant } = parsed.data;
+  const { parcelleId, dateRecolte, remorque, poidsKg, humiditeAvant, heureSaisie } = parsed.data;
 
   // Numéro éventuellement imposé par l'utilisateur (champ éditable).
   const numeroRaw = formData.get("numeroChargement");
@@ -112,6 +113,7 @@ export async function createLot(
         numeroChargement: numero,
         poidsKg,
         humiditeAvant,
+        heureSaisie: heureSaisie && heureSaisie.length > 0 ? heureSaisie : null,
         createdById: session.user.id,
       },
     });

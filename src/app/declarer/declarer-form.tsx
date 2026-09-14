@@ -32,6 +32,7 @@ export function DeclarerForm({
 }) {
   const [state, formAction] = useFormState(declarerLot, {});
   const aujourdhui = new Date().toISOString().slice(0, 10);
+  const maintenant = new Date().toTimeString().slice(0, 5);
 
   if (state.reference) {
     return (
@@ -45,6 +46,7 @@ export function DeclarerForm({
             Vous pouvez déposer la caisse au séchoir. L&apos;administrateur va valider la déclaration.
           </p>
         </div>
+        <p className="text-base font-semibold text-accent">Tu peux aller boire une bière 🍺</p>
         <Button className="w-full" onClick={() => window.location.reload()}>
           Déclarer une autre caisse
         </Button>
@@ -100,9 +102,15 @@ export function DeclarerForm({
         </Select>
       </div>
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="dateRecolte">Date de récolte</Label>
-        <Input id="dateRecolte" name="dateRecolte" type="date" defaultValue={aujourdhui} required />
+      <div className="grid grid-cols-2 gap-4">
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="dateRecolte">Date de récolte</Label>
+          <Input id="dateRecolte" name="dateRecolte" type="date" defaultValue={aujourdhui} required />
+        </div>
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="heureSaisie">Heure</Label>
+          <Input id="heureSaisie" name="heureSaisie" type="time" defaultValue={maintenant} />
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">

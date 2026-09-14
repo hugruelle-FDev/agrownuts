@@ -159,6 +159,7 @@ model Lot {
   sechoirPlace     Int? // emplacement dans le séchoir (1..capacité), null si hors séchoir
   chauffeur        String? // nom du chauffeur (déclaration QR)
   commentaire      String? // commentaire libre (déclaration QR)
+  heureSaisie      String? // heure de mise au séchoir (HH:MM), donnée informative
   createdById      String?
   createdBy        User?     @relation("LotCreePar", fields: [createdById], references: [id], onDelete: SetNull)
   createdAt        DateTime  @default(now())

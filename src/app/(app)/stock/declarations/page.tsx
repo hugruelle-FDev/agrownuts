@@ -30,6 +30,7 @@ export default async function DeclarationsPage() {
               <th>Chauffeur</th>
               <th>Parcelle</th>
               <th>Récolte</th>
+              <th>Heure</th>
               <th>Remorque</th>
               <th className="text-right">Poids</th>
               <th className="text-right">Humidité</th>
@@ -48,6 +49,7 @@ export default async function DeclarationsPage() {
                 <td>{l.chauffeur ?? "—"}</td>
                 <td className="font-mono">{l.parcelle.code}</td>
                 <td>{formatDateFr(l.dateRecolte)}</td>
+                <td className="font-mono">{l.heureSaisie ?? "—"}</td>
                 <td className="font-mono">{l.remorque}</td>
                 <td className="text-right">{formatKg(Number(l.poidsKg))}</td>
                 <td className="text-right">{formatPourcent(Number(l.humiditeAvant))}</td>
