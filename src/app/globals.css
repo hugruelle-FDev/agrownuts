@@ -31,22 +31,22 @@
     /* Couleurs de marque */
     --brand-green: #1f3d2f;
     --brand-terracotta: #c0663a;
-    --logo-stroke: #1f3d2f;
+    --logo-stroke: #c0663a;
   }
 
   .dark {
     /* ---- Thème sombre : vert forêt profond & terracotta ---- */
-    --background: #14241b;
+    --background: #000000;
     --foreground: #f2ece0;
-    --card: #1f3d2f;
-    --card-elevated: #274a38;
+    --card: #2E5540;
+    --card-elevated: #2f513f;
     --primary: #c0663a; /* terracotta */
     --primary-foreground: #f4efe4;
     --accent: #d4874e; /* terracotta clair */
     --accent-foreground: #14241b;
     --muted: #274a38;
     --muted-foreground: #a9bca6;
-    --border: #2f4c3b;
+    --border: #ddd3c0;
     --input: #2f4c3b;
     --ring: #d4874e;
     --success: #8fa678;
