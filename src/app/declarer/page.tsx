@@ -38,7 +38,7 @@ export default async function DeclarerPage({ searchParams }: { searchParams: { t
 async function DeclarerFormLoader({ token }: { token: string }) {
   const [parcelles, remorques, chauffeurs] = await Promise.all([
     prisma.parcelle.findMany({ where: { actif: true }, orderBy: { code: "asc" }, select: { id: true, code: true, nom: true } }),
-    prisma.remorque.findMany({ where: { actif: true }, orderBy: { code: "asc" }, select: { id: true, code: true, nom: true } }),
+    prisma.remorque.findMany({ where: { actif: true }, orderBy: { code: "asc" }, select: { id: true, code: true, nom: true, poidsVideKg: true } }),
     prisma.chauffeur.findMany({ where: { actif: true }, orderBy: { nom: "asc" }, select: { id: true, nom: true } }),
   ]);
 

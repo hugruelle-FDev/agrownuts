@@ -96,10 +96,13 @@ export default async function ParametresPage() {
       <Card>
         <CardHeader>
           <CardTitle>Remorques</CardTitle>
-          <CardDescription>Le code apparaît dans la référence du lot (ex. « B2 »).</CardDescription>
+          <CardDescription>
+            Le code apparaît dans la référence du lot (ex. « B2 »). Le poids à vide (tare) permet
+            de calculer automatiquement le poids net des caisses.
+          </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <RefForm action={createRemorque} prefix="remorque" />
+          <RefForm action={createRemorque} prefix="remorque" poidsVide />
           <div className="flex flex-col gap-2">
             {remorques.length === 0 && (
               <p className="text-sm text-muted-foreground">Aucune remorque pour l&apos;instant.</p>
@@ -107,6 +110,15 @@ export default async function ParametresPage() {
             {remorques.map((r) => (
               <div key={r.id} className={ROW}>
                 <span className="font-mono text-sm font-semibold">{r.code}</span>
+                <span className="text-sm text-muted-foreground">
+                  {r.poidsVideKg != null ? (
+                    <>
+                      Poids à vide : <span className="font-medium text-foreground">{r.poidsVideKg} kg</span>
+                    </>
+                  ) : (
+                    "Poids à vide non défini"
+                  )}
+                </span>
                 <span className="flex-1 text-sm text-muted-foreground">{r.nom ?? "—"}</span>
                 <DeleteButton
                   action={deleteRemorque}

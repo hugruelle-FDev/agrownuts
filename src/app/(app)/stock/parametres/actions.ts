@@ -11,6 +11,17 @@ const refSchema = z.object({
   nom: z.string().trim().max(100).optional(),
 });
 
+const remorqueSchema = z.object({
+  code: z.string().trim().min(1, "Le code est requis").max(10, "Code trop long (10 max)"),
+  poidsVide: z.coerce
+    .number()
+    .int("Le poids à vide doit être un nombre entier")
+    .min(0, "Le poids à vide doit être positif")
+    .max(100000, "Poids à vide invalide")
+    .optional(),
+  nom: z.string().trim().max(100).optional(),
+});
+
 export type RefFormState = { error?: string; success?: string };
 
 function estConflitUnicite(e: unknown): boolean {
@@ -76,14 +87,20 @@ export async function createRemorque(
   if (!session?.user) return { error: "Session expirée." };
   if (session.user.role === "LECTURE") return { error: "Vos droits ne permettent pas cette action." };
 
-  const parsed = refSchema.safeParse(Object.fromEntries(formData));
+  // Un champ « poids à vide » vide ne doit pas être interprété comme 0 :
+  // on le retire avant validation pour le stocker en null (pas de tare définie).
+  const brut = Object.fromEntries(formData) as Record<string, unknown>;
+  if (typeof brut.poidsVide === "string" && brut.poidsVide.trim() === "") delete brut.poidsVide;
+
+  const parsed = remorqueSchema.safeParse(brut);
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Formulaire invalide." };
 
   const code = parsed.data.code.toUpperCase();
+  const poidsVideKg = parsed.data.poidsVide ?? null;
   const nom = parsed.data.nom && parsed.data.nom.length > 0 ? parsed.data.nom : null;
 
   try {
-    await prisma.remorque.create({ data: { code, nom } });
+    await prisma.remorque.create({ data: { code, poidsVideKg, nom } });
   } catch (e) {
     if (estConflitUnicite(e)) return { error: `La remorque « ${code} » existe déjà.` };
     return { error: "Erreur lors de la création de la remorque." };

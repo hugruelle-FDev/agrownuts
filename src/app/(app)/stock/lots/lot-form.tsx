@@ -7,9 +7,11 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
+import { PoidsCaisse } from "@/components/poids-caisse";
 import { createLot, suggererNumero } from "./actions";
 
 type Option = { id: string; code: string; nom: string | null };
+type RemorqueOption = Option & { poidsVideKg: number | null };
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -25,7 +27,7 @@ export function LotForm({
   remorques,
 }: {
   parcelles: Option[];
-  remorques: Option[];
+  remorques: RemorqueOption[];
 }) {
   const [state, formAction] = useFormState(createLot, {});
   const formRef = useRef<HTMLFormElement>(null);
@@ -35,6 +37,7 @@ export function LotForm({
   const [parcelleId, setParcelleId] = useState("");
   const [dateRecolte, setDateRecolte] = useState(aujourdhui);
   const [numero, setNumero] = useState("");
+  const [remorque, setRemorque] = useState("");
 
   // Met à jour le numéro proposé quand la parcelle ou la date change.
   useEffect(() => {
@@ -58,6 +61,7 @@ export function LotForm({
       setParcelleId("");
       setDateRecolte(aujourdhui);
       setNumero("");
+      setRemorque("");
     }
   }, [state.success, aujourdhui]);
 
@@ -104,7 +108,13 @@ export function LotForm({
 
         <div className="flex flex-col gap-2">
           <Label htmlFor="remorque">Remorque</Label>
-          <Select id="remorque" name="remorque" defaultValue="" required>
+          <Select
+            id="remorque"
+            name="remorque"
+            value={remorque}
+            onChange={(e) => setRemorque(e.target.value)}
+            required
+          >
             <option value="" disabled>
               Choisir une remorque…
             </option>
@@ -133,10 +143,7 @@ export function LotForm({
           </span>
         </div>
 
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="poidsKg">Poids de la remorque</Label>
-          <Input id="poidsKg" name="poidsKg" type="number" step="0.01" min="0" placeholder="kg" required />
-        </div>
+        <PoidsCaisse remorqueCode={remorque} remorques={remorques} />
 
         <div className="flex flex-col gap-2">
           <Label htmlFor="humiditeAvant">Humidité avant séchage</Label>

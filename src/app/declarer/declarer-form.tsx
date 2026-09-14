@@ -1,13 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
+import { PoidsCaisse } from "@/components/poids-caisse";
 import { declarerLot } from "./actions";
 
 type Option = { id: string; code: string; nom: string | null };
+type RemorqueOption = Option & { poidsVideKg: number | null };
 type Chauffeur = { id: string; nom: string };
 
 function SubmitButton() {
@@ -27,12 +30,13 @@ export function DeclarerForm({
 }: {
   token: string;
   parcelles: Option[];
-  remorques: Option[];
+  remorques: RemorqueOption[];
   chauffeurs: Chauffeur[];
 }) {
   const [state, formAction] = useFormState(declarerLot, {});
   const aujourdhui = new Date().toISOString().slice(0, 10);
   const maintenant = new Date().toTimeString().slice(0, 5);
+  const [remorque, setRemorque] = useState("");
 
   if (state.reference) {
     return (
@@ -89,7 +93,13 @@ export function DeclarerForm({
 
       <div className="flex flex-col gap-2">
         <Label htmlFor="remorque">Remorque</Label>
-        <Select id="remorque" name="remorque" defaultValue="" required>
+        <Select
+          id="remorque"
+          name="remorque"
+          value={remorque}
+          onChange={(e) => setRemorque(e.target.value)}
+          required
+        >
           <option value="" disabled>
             Choisir une remorque…
           </option>
@@ -113,15 +123,11 @@ export function DeclarerForm({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="poidsKg">Poids</Label>
-          <Input id="poidsKg" name="poidsKg" type="number" step="0.01" min="0" placeholder="kg" required />
-        </div>
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="humiditeAvant">Humidité</Label>
-          <Input id="humiditeAvant" name="humiditeAvant" type="number" step="0.1" min="0" max="100" placeholder="%" required />
-        </div>
+      <PoidsCaisse remorqueCode={remorque} remorques={remorques} />
+
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="humiditeAvant">Humidité</Label>
+        <Input id="humiditeAvant" name="humiditeAvant" type="number" step="0.1" min="0" max="100" placeholder="%" required />
       </div>
 
       <div className="flex flex-col gap-2">

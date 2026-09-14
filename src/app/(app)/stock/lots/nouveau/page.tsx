@@ -16,7 +16,7 @@ export default async function NouveauLotPage() {
     prisma.remorque.findMany({
       where: { actif: true },
       orderBy: { code: "asc" },
-      select: { id: true, code: true, nom: true },
+      select: { id: true, code: true, nom: true, poidsVideKg: true },
     }),
   ]);
 

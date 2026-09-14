@@ -100,11 +100,12 @@ model Produit {
 /// Remorque physique (liste déroulante gérée par l'utilisateur).
 /// Le code (ex. "B2") est repris dans la référence du lot.
 model Remorque {
-  id        String   @id @default(cuid())
-  code      String   @unique
-  nom       String?
-  actif     Boolean  @default(true)
-  createdAt DateTime @default(now())
+  id          String   @id @default(cuid())
+  code        String   @unique
+  nom         String?
+  poidsVideKg Int? // poids à vide (tare) de la remorque, en kg — sert au calcul du poids net
+  actif       Boolean  @default(true)
+  createdAt   DateTime @default(now())
 
   @@map("remorques")
 }

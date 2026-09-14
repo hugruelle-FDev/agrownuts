@@ -27,6 +27,46 @@ const lotSchema = z.object({
   heureSaisie: z.string().trim().max(5).optional(),
 });
 
+/**
+ * Schéma de création : le poids saisi (`poidsPese`) et le choix de déduction de
+ * la tare (`deduireTare`) sont fournis par le formulaire. Le poids net stocké
+ * est recalculé côté serveur (voir `createLot`).
+ */
+const createLotSchema = z.object({
+  parcelleId: z.string().min(1, "Choisissez une parcelle"),
+  dateRecolte: z.string().min(1, "La date de récolte est requise"),
+  remorque: z.string().trim().min(1, "Choisissez une remorque").max(20),
+  poidsPese: z.coerce.number().positive("Le poids doit être positif"),
+  deduireTare: z.string().optional(),
+  humiditeAvant: z.coerce
+    .number()
+    .min(0, "Humidité invalide")
+    .max(100, "L'humidité ne peut dépasser 100 %"),
+  heureSaisie: z.string().trim().max(5).optional(),
+});
+
+/**
+ * Calcule le poids net d'une caisse à partir du poids pesé et de la tare de la
+ * remorque. Si la déduction est demandée et qu'une tare existe, on la retire ;
+ * sinon le poids pesé est conservé tel quel. Renvoie une erreur si le net ≤ 0.
+ */
+async function calculerPoidsNet(
+  remorqueNorm: string,
+  poidsPese: number,
+  deduireTare: boolean,
+): Promise<{ poidsKg: number } | { error: string }> {
+  if (!deduireTare) return { poidsKg: poidsPese };
+  const rem = await prisma.remorque.findUnique({ where: { code: remorqueNorm } });
+  if (rem?.poidsVideKg == null) return { poidsKg: poidsPese };
+  const net = poidsPese - rem.poidsVideKg;
+  if (net <= 0) {
+    return {
+      error: `Poids net ≤ 0 : le poids pesé (${poidsPese} kg) est inférieur au poids à vide de la remorque (${rem.poidsVideKg} kg).`,
+    };
+  }
+  return { poidsKg: Math.round(net * 100) / 100 };
+}
+
 export type LotFormState = { error?: string; success?: string };
 
 function estConflitUnicite(e: unknown): boolean {
@@ -77,11 +117,18 @@ export async function createLot(
     return { error: "Vos droits ne permettent pas de créer un lot." };
   }
 
-  const parsed = lotSchema.safeParse(Object.fromEntries(formData));
+  const parsed = createLotSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Formulaire invalide." };
   }
-  const { parcelleId, dateRecolte, remorque, poidsKg, humiditeAvant, heureSaisie } = parsed.data;
+  const { parcelleId, dateRecolte, remorque, poidsPese, deduireTare, humiditeAvant, heureSaisie } =
+    parsed.data;
+
+  // Poids net : on retire la tare de la remorque si le chauffeur l'a demandé.
+  const remorqueNorm = remorque.toUpperCase();
+  const netRes = await calculerPoidsNet(remorqueNorm, poidsPese, deduireTare === "1");
+  if ("error" in netRes) return { error: netRes.error };
+  const poidsKg = netRes.poidsKg;
 
   // Numéro éventuellement imposé par l'utilisateur (champ éditable).
   const numeroRaw = formData.get("numeroChargement");
@@ -99,7 +146,6 @@ export async function createLot(
   if (Number.isNaN(date.getTime())) return { error: "Date de récolte invalide." };
 
   const { debut, fin, periode } = bornesMois(date);
-  const remorqueNorm = remorque.toUpperCase();
 
   // Enregistre un lot avec un numéro donné (référence + audit).
   const creer = async (numero: number) => {
