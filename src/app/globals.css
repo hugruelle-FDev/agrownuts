@@ -26,7 +26,7 @@
     --ring: #1f3d2f;
     --success: #3e7c54;
     --warning: #d98b5f; /* terracotta clair */
-    --danger: #b23a2e;
+    --danger: #d61604;
 
     /* Couleurs de marque */
     --brand-green: #1f3d2f;
@@ -46,8 +46,8 @@
     --accent-foreground: #14241b;
     --muted: #274a38;
     --muted-foreground: #a9bca6;
-    --border: #2f4c3b;
-    --input: #2f4c3b;
+    --border: #ddd3c0;
+    --input: #ddd3c0;
     --ring: #d4874e;
     --success: #8fa678;
     --warning: #d98b5f;
